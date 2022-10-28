@@ -1,6 +1,5 @@
 package com.example.uiwidgettest;
 
-import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.example.uiwidgettest.login.LoginActivity;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -40,13 +41,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button news_btn = findViewById(R.id.test_news_btn);
         news_btn.setOnClickListener(this);
 
+        Button offline_btn = findViewById(R.id.test_force_offline_btn);
+        offline_btn.setOnClickListener(this);
+
         //注册广播
         intentFilter = new IntentFilter();
         intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
         networkChangeReceiver = new NetworkChangeReceiver();
         Log.i("MainActivity","register network chagne broastcase");
         registerReceiver(networkChangeReceiver, intentFilter);
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(networkChangeReceiver);
     }
 
     @Override
@@ -70,6 +79,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             case R.id.test_news_btn:{
                 Intent intent = new Intent(this, NewsMainActivity.class);
+                startActivity(intent);
+                break;
+            }
+            case R.id.test_force_offline_btn: {
+                Intent intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
                 break;
             }
