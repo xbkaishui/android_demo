@@ -14,6 +14,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.uiwidgettest.login.LoginActivity;
+import com.tencent.mmkv.MMKV;
+
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -24,6 +26,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        String rootDir = MMKV.initialize(this);
+        Log.w("MainActivity","mmkv root: " + rootDir);
+
         ActionBar actionBar = getSupportActionBar();
         if(actionBar != null){
             actionBar.hide();
@@ -43,6 +48,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Button offline_btn = findViewById(R.id.test_force_offline_btn);
         offline_btn.setOnClickListener(this);
+
+        Button mmkv_btn = findViewById(R.id.test_mmkv);
+        mmkv_btn.setOnClickListener(this);
 
         //注册广播
         intentFilter = new IntentFilter();
@@ -87,7 +95,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intent);
                 break;
             }
+            case R.id.test_mmkv: {
+                testMMKV();
+                break;
+            }
         }
+    }
+
+    void testMMKV() {
+        MMKV kv = MMKV.defaultMMKV();
+
+        kv.encode("bool", true);
+        System.out.println("bool: " + kv.decodeBool("bool"));
+
+        kv.encode("int", Integer.MIN_VALUE);
+        System.out.println("int: " + kv.decodeInt("int"));
+
+        kv.encode("long", Long.MAX_VALUE);
+        System.out.println("long: " + kv.decodeLong("long"));
+
+        kv.encode("float", -3.14f);
+        System.out.println("float: " + kv.decodeFloat("float"));
+
+        kv.encode("double", Double.MIN_VALUE);
+        System.out.println("double: " + kv.decodeDouble("double"));
+
+        kv.encode("string", "Hello from mmkv");
+        System.out.println("string: " + kv.decodeString("string"));
+
+        byte[] bytes = {'m', 'm', 'k', 'v'};
+        kv.encode("bytes", bytes);
+        System.out.println("bytes: " + new String(kv.decodeBytes("bytes")));
+
     }
 
     class NetworkChangeReceiver extends BroadcastReceiver {
