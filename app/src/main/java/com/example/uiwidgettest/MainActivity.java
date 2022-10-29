@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.uiwidgettest.login.LoginActivity;
+import com.example.uiwidgettest.store.MyDatabaseHelper;
 import com.tencent.mmkv.MMKV;
 
 
@@ -22,13 +23,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private NetworkChangeReceiver networkChangeReceiver;
     private IntentFilter intentFilter;
 
+    private static final String TAG = MyDatabaseHelper.class.getSimpleName();
+
+    private MyDatabaseHelper databaseHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         String rootDir = MMKV.initialize(this);
         Log.w("MainActivity","mmkv root: " + rootDir);
-
+        databaseHelper = new MyDatabaseHelper(this, "BookStore.db", null, 1);
+        String baseDir = getFilesDir().getAbsolutePath();
+        Log.i(TAG, "base dir " + baseDir);
         ActionBar actionBar = getSupportActionBar();
         if(actionBar != null){
             actionBar.hide();
@@ -51,6 +58,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Button mmkv_btn = findViewById(R.id.test_mmkv);
         mmkv_btn.setOnClickListener(this);
+
+        Button db_btn = findViewById(R.id.test_database);
+        db_btn.setOnClickListener(this);
 
         //注册广播
         intentFilter = new IntentFilter();
@@ -99,7 +109,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 testMMKV();
                 break;
             }
+            case R.id.test_database: {
+                testSqlLite();
+                break;
+            }
         }
+    }
+
+    void testSqlLite() {
+        databaseHelper.getWritableDatabase();
     }
 
     void testMMKV() {
